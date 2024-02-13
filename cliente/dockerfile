@@ -1,0 +1,16 @@
+# Use uma imagem base do Python para alpine
+FROM python:3.9-alpine
+
+# Defina o diretório de trabalho como /app
+WORKDIR /app
+
+# Copie todos os arquivos necessários para o diretório de trabalho (/app) no contêiner
+COPY index.html /app
+COPY style.css /app
+COPY script.js /app
+
+# Exponha a porta 8000 para que os clientes possam se conectar ao servidor HTTP
+EXPOSE 8000
+
+# Execute o servidor HTTP do Python quando o contêiner for iniciado
+CMD ["python", "-m", "http.server", "8000"]

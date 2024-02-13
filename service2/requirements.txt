@@ -1,0 +1,5 @@
+Flask
+Flask-Cors
+couchbase
+requests
+Flask[async]

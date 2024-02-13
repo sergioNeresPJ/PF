@@ -1,0 +1,19 @@
+# Use uma imagem oficial do Python como base
+FROM python:3.9-slim
+
+# Define o diretório de trabalho dentro do contêiner
+WORKDIR /app
+
+# Copia os arquivos necessários para o contêiner
+COPY requirements.txt /app
+COPY service.py /app
+
+# Instala as dependências do Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Define variáveis de ambiente para conexão com o MongoDB
+# Expõe a porta 8081 para comunicação externa (se necessário)
+EXPOSE 8081
+
+# Comando para iniciar o serviço
+CMD ["python", "service.py"]

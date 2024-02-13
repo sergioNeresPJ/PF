@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  meu-couchbase:
+    image: couchbase/server:latest
+    container_name: meu-couchbase
+    ports:
+      - "8091:8091"  # Porta do painel de controle do Couchbase
+      - "8092:8092"  # Porta de acesso ao cluster
+      - "8093:8093"  # Porta de consulta do N1QL
+      - "11210:11210" # Porta de acesso ao bucket
+    environment:
+      - COUCHBASE_ADMINISTRATOR_USERNAME=root
+      - COUCHBASE_ADMINISTRATOR_PASSWORD=example
+    volumes:
+      - couchbase_data:/opt/couchbase/var
+    networks:
+      - minha-rede
+
+  meu-servico-python:
+    build:
+      context: ./service1
+      dockerfile: dockerfile
+    container_name: meu-servico-python
+    ports:
+      - "8081:8081"
+    depends_on:
+      - meu-couchbase
+    environment:
+      COUCHBASE_HOST: "meu-couchbase"
+      COUCHBASE_PORT: "8091"
+      COUCHBASE_BUCKET: "projetoSD"
+      COUCHBASE_USERNAME: "root"
+      COUCHBASE_PASSWORD: "example"
+    networks:
+      - minha-rede
+
+  meu-segundo-servico-python:
+    build:
+      context: ./service2
+      dockerfile: dockerfile
+    container_name: meu-segundo-servico-python
+    ports:
+      - "8082:8082"
+    depends_on:
+      - meu-couchbase
+    environment:
+      COUCHBASE_HOST: "meu-couchbase"
+      COUCHBASE_PORT: "8091"
+      COUCHBASE_BUCKET: "projetoSD"
+      COUCHBASE_USERNAME: "root"
+      COUCHBASE_PASSWORD: "example"
+    networks:
+      - minha-rede
+
+  meu-balanceador-python:
+    build:
+      context: ./balancer
+      dockerfile: dockerfile
+    container_name: meu-balanceador-python
+    ports:
+      - "5000:5000"
+    networks:
+      - minha-rede
+
+  meu-servidor-web:
+    build:
+      context: ./cliente
+      dockerfile: dockerfile
+    container_name: meu-server-web
+    ports:
+      - "8000:8000"
+    networks:
+      - minha-rede
+
+networks:
+  minha-rede:
+    driver: bridge
+
+volumes:
+  couchbase_data:
